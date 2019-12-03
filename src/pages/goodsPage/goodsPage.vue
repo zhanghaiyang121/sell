@@ -127,8 +127,6 @@ export default {
             }
         },
         decreasefood(food,foodTypeGoods){
-            console.log(food)
-            console.log(foodTypeGoods)
             food.count--
             foodTypeGoods.count--
         },

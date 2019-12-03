@@ -2,16 +2,18 @@
   <div id="app">
     <commonHeader @showdetail="showdetail" :seller="seller"/>
     <div class="tabbar">
-      <div :class="{highlight:currentindex==1}" @click="selectTab(1)">商品</div>
-      <div :class="{highlight:currentindex==2}" @click="selectTab(2)">评论</div>
-      <div :class="{highlight:currentindex==3}" @click="selectTab(3)">商家</div>
+      <div :class="{highlight:'/goods'==$route.path}" @click="selectTab(1,'/goods')">商品</div>
+      <div :class="{highlight:'/rating'==$route.path}" @click="selectTab(2,'/rating')">评论</div>
+      <div :class="{highlight:'/seller'==$route.path}" @click="selectTab(3,'/seller')">商家</div>
     </div>
     <transition name="fade">
           <headerDetail @hide="hide" :seller="seller" v-show="show"/>
     </transition>
-    <keep-alive>
-      <router-view/>
-    </keep-alive>
+    <transition name="component-fade" mode="out-in">
+      <!-- <keep-alive> -->
+          <router-view/>
+      <!-- </keep-alive> -->
+    </transition>
   </div>
 </template>
 
@@ -36,8 +38,9 @@ export default {
       this.getShopInfo()
   },
   methods:{
-      selectTab(index){
+      selectTab(index,path){
         this.currentindex=index
+        this.$router.push(path)
       },
       async getShopInfo(){
           const result=await reqShopInfo()
@@ -77,4 +80,7 @@ html, body
     transition: opacity .5s
 .fade-enter, .fade-leave-to 
     opacity: 0
+.component-fade-enter-active, .component-fade-leave-active {
+  transition: all .3s ease;
+}
 </style>
