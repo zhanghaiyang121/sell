@@ -3,17 +3,18 @@
       <div class="goods_content">
           <div class="menu_wrapper">
               <div class="menu_content">
-                  <div class="menu_item" v-for="(item,index) in shopGoods" :key="index">
-                    <div class="menu_item_box">
+                  <div class="menu_item" :class="{hightlight:currentindex==index}" v-for="(item,index) in shopGoods" :key="index">
+                    <div class="menu_item_box" @click="selecttype(index)">
                         <div class="text">
                             <span v-if="item.type!=-1" :class="'bulletin_icon_'+(item.type+1)"></span><span class="bulletin_text">{{item.name}}</span>
+                            <div class="slect_food_count" v-if="item.count">{{item.count}}</div>
                         </div>
                     </div>
                 </div>
               </div>
           </div>
           <div class="food_wrapper">
-              <div class="foods_content">
+              <div class="foods_content" ref="food_content">
                   <div class="food_type_wrapper" v-for="(goodsItem,index) in shopGoods" :key="index">
                       <div class="food_type">
                           {{goodsItem.name}}
@@ -33,6 +34,9 @@
                                         <span class="new_price">￥{{food.price}}</span>
                                         <span class="old_price" v-if="food.oldprice">￥{{food.oldPrice}}</span>
                                     </div>
+                                    <div class="cart_control_wrapper">
+                                        <cartControl :food="food" :goodTypeFoods="goodsItem" @addfood="addfood" @decreasefood="decreasefood"/>
+                                    </div>
                               </div>
                           </div>
                       </div>
@@ -40,35 +44,119 @@
               </div>
           </div>
       </div>
-      <div class="shop_cart">
-
+      <div class="shop_cart_wrapper">
+          <shopCart :totalFee="totalFee" :totalNum="totalNum" :shopGoods="shopGoods" @addfood="addfood" @decreasefood="decreasefood"/>
       </div>
   </div>
 </template>
 
 <script>
 import BScroll from "better-scroll"
+import cartControl from "../../components/cartControl/cartControl"
+import shopCart from "../../components/shopCart/shopCart"
 import {reqShopGoods} from "../../api/index"
 export default {
     data(){
         return{
-            shopGoods:[]
+            shopGoods:[],
+            menuScroll:{},
+            goodsScroll:{},
+            heightarr:[],
+            scrollY:0
+        }
+    },
+    components:{
+        cartControl,
+        shopCart
+    },
+    computed:{
+        currentindex(){
+            for(let i=0;i<this.heightarr.length;i++){
+                let height1=this.heightarr[i]
+                let height2=this.heightarr[i+1]
+                if(this.scrollY<=0){
+                    if(!height2||-this.scrollY<-height2&&-this.scrollY>=-height1){
+                        return i
+                    }
+                }
+            }
+            if(this.scrollY>0){
+                return 0
+            }
+            return 0
+        },
+        totalFee(){
+            let sum=0
+            for(let i=0;i<this.shopGoods.length;i++){
+                if(this.shopGoods[i].count>0){
+                    for(let j=0;j<this.shopGoods[i].foods.length;j++){
+                        if(this.shopGoods[i].foods[j].count>0){
+                            sum+=this.shopGoods[i].foods[j].price*this.shopGoods[i].foods[j].count
+                        }
+                    }
+                }
+            }
+            return sum
+        },
+        totalNum(){
+            let num=0
+            for(let i=0;i<this.shopGoods.length;i++){
+                if(this.shopGoods[i].count>0){
+                    num+=this.shopGoods[i].count
+                }
+            }
+            return num
         }
     },
     methods:{
+        selecttype(index){
+            this.scrollY=this.heightarr[index]
+            this.goodsScroll.scrollTo(0,this.heightarr[index],500)
+        },
+        addfood(food,foodTypeGoods){
+            if(food.count>=0){
+                food.count++
+                foodTypeGoods.count++
+            }else{
+                this.$set(food,"count",1)
+                if(foodTypeGoods.count>=0){
+                    foodTypeGoods.count++
+                }else{
+                    this.$set(foodTypeGoods,"count",1)
+                }
+            }
+        },
+        decreasefood(food,foodTypeGoods){
+            console.log(food)
+            console.log(foodTypeGoods)
+            food.count--
+            foodTypeGoods.count--
+        },
         async getShopGoods(){
             const result=await reqShopGoods()
             this.shopGoods=result.data
-            console.log(result)
             this.$nextTick(()=>{
-                new BScroll('.food_wrapper', {
+                this.goodsScroll=new BScroll('.food_wrapper', {
+                    click: true,
+                    probeType:2
+                })
+                this.menuScroll=new BScroll('.menu_wrapper', {
                     click: true
                 })
-                new BScroll('.menu_wrapper', {
-                    click: true
+                let foodchild=this.$refs['food_content'].children
+                let heightarr=[0]
+                let itemheight=0
+                for(let i=0;i<foodchild.length;i++){
+                    itemheight=foodchild[i].clientHeight+itemheight
+                    heightarr.push(-itemheight)
+                }
+                this.heightarr=heightarr
+                this.goodsScroll.on("scroll",(pos)=>{
+                    this.scrollY=pos.y
                 })
             })
-        }
+        },
+
     },
     created(){
         this.getShopGoods()
@@ -81,7 +169,7 @@ export default {
 .goods_page
     width 100%
     position absolute
-    top 142px
+    top 182px
     bottom 0px
     z-index 200
 .goods_content
@@ -95,6 +183,8 @@ export default {
         background #f3f5f7
         overflow hidden
         .menu_item
+            &.hightlight
+                background #fff
             .menu_item_box
                 height 54px
                 line-height 14px
@@ -102,8 +192,20 @@ export default {
                 display flex
                 align-items center
                 .text
+                    position relative
                     flex 1
                     padding 0 10px
+                    .slect_food_count
+                        position absolute
+                        top -10px
+                        right 3px
+                        font-size 10px
+                        height 16px
+                        border-radius 16px
+                        line-height 16px
+                        padding 0 5px
+                        background: linear-gradient(to right, #fc9153, #f01414)
+                        color #fff
                     .bulletin_icon_1
                         display inline-block
                         vertical-align top
@@ -173,6 +275,7 @@ export default {
                             margin-right 10px
                         .food_content
                             flex 1
+                            position relative
                             .food_name
                                 font-size 14px
                                 color rgb(7,17,27)
@@ -194,12 +297,14 @@ export default {
                                 margin-top 8px
                                 .new_price
                                     color red
-.shop_cart
+                            .cart_control_wrapper
+                                position absolute
+                                bottom -5px
+                                right 0px
+.shop_cart_wrapper
     position absolute
     height 50px
     width 100%
     bottom 0
     left 0
-
-    
 </style>

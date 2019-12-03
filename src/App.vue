@@ -1,10 +1,17 @@
 <template>
   <div id="app">
     <commonHeader @showdetail="showdetail" :seller="seller"/>
+    <div class="tabbar">
+      <div :class="{highlight:currentindex==1}" @click="selectTab(1)">商品</div>
+      <div :class="{highlight:currentindex==2}" @click="selectTab(2)">评论</div>
+      <div :class="{highlight:currentindex==3}" @click="selectTab(3)">商家</div>
+    </div>
     <transition name="fade">
           <headerDetail @hide="hide" :seller="seller" v-show="show"/>
     </transition>
-    <router-view/>
+    <keep-alive>
+      <router-view/>
+    </keep-alive>
   </div>
 </template>
 
@@ -21,13 +28,17 @@ export default {
   data(){
         return{
             seller:{},
-            show:false
+            show:false,
+            currentindex:1
         }
     },
   mounted(){
       this.getShopInfo()
   },
   methods:{
+      selectTab(index){
+        this.currentindex=index
+      },
       async getShopInfo(){
           const result=await reqShopInfo()
           this.seller=result.data
@@ -36,7 +47,6 @@ export default {
           this.show=true
       },
       hide(){
-        console.log(1)
           this.show=false
       }
   }
@@ -52,8 +62,19 @@ html, body
   width 100%
   height 100%
   position relative
+  .tabbar
+    height 40px
+    display flex
+    width 100%
+    align-items center
+    border-bottom 1px solid rgba(7,17,27,0.1)
+    &>div
+      flex 1
+      text-align center
+      &.highlight
+        color #f01414
 .fade-enter-active, .fade-leave-active
-      transition: opacity .5s; 
+    transition: opacity .5s
 .fade-enter, .fade-leave-to 
-    opacity: 0;
+    opacity: 0
 </style>
