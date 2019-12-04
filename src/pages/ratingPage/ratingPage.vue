@@ -28,15 +28,17 @@
         </div>
         <div class="rating_tabs_wrapper">
           <div class="tabs_content">
-              <div class="all">全部</div><div class="good">满意</div><div class="bad">不满意</div>
+              <div class="all" @click="slectRating('allRatings',1)" :class="{highlight:curretIndex==1}">全部{{allRatings.length}}</div>
+              <div class="good" @click="slectRating('goodRatings',2)" :class="{highlight:curretIndex==2}">满意{{goodRatings.length}}</div>
+              <div class="bad" @click="slectRating('badRatings',3)" :class="{highlight:curretIndex==3}">不满意{{badRatings.length}}</div>
           </div>
         </div>
-        <div class="filter_rating">
-          <i class="icon-check_circle"></i>
+        <div class="filter_rating" @click="filterShow=!filterShow">
+          <i class="icon-check_circle" :class="{highlight:!filterShow}"></i>
           <span class="text">只看有内容的评价</span>
         </div>
         <div class="rating_list_wrapper">
-            <div class="rating_item" v-for="(item,index) in ratings" :key="index">
+            <div class="rating_item" v-for="(item,index) in ratings" :key="index" v-if="filterShow ? true:item.text!=''">
                 <div class="avatar">
                   <img :src="item.avatar" width="28" height="28" alt="">
                 </div>
@@ -59,7 +61,6 @@
             </div>
         </div>
       </div>
-      
   </div>
 </template>
 
@@ -75,18 +76,39 @@ export default {
     async getRatings(){
       const result=await reqShopRatings()
       this.ratings=result.data
-      
+      let goodRating=[]
+      let badRating=[]
+      let allRating=result.data
+      for(let i=0;i<result.data.length;i++){
+        if(result.data[i].rateType==0){
+          goodRating.push(result.data[i])
+        }else{
+          badRating.push(result.data[i])
+        }
+      }
+      this.goodRatings=goodRating
+      this.badRatings=badRating
+      this.allRatings=allRating
     },
     async getShopInfo(){
       const result=await reqShopInfo()
       this.seller=result.data
+    },
+    slectRating(type,index){
+        this.ratings=this[type]
+        this.curretIndex=index
     }
   },
   data(){
     return{
       ratings:[],
+      allRatings:[],
+      goodRatings:[],
+      badRatings:[],
       seller:{},
-      scroll:null
+      scroll:null,
+      filterShow:true,
+      curretIndex:1
     }
   },
   created(){
@@ -95,7 +117,9 @@ export default {
   },
   mounted(){
     this.$nextTick(()=>{
-      this.scroll=new BScroll(".ratingPage")
+      this.scroll=new BScroll(".ratingPage",{
+        click:true
+      })
     })
   }
 }
@@ -175,20 +199,29 @@ export default {
           display inline-block
           margin-right 10px
         .all
-          background #00a0dc
+          background rgba(0,160,220,0.2)
           font-size 12px
-          color #fff
+          color #666
           padding 8px 12px
+          &.highlight
+            background #00a0dc
+            color #fff
         .good
           background rgba(0,160,220,0.2)
           font-size 12px
           color #666
           padding 8px 12px
+          &.highlight
+            background #00a0dc
+            color #fff
         .bad
           background #ccc
           font-size 12px
           color #666
           padding 8px 12px
+          &.highlight
+            background #666
+            color #fff
     .filter_rating
       display flex
       align-items center
@@ -197,6 +230,8 @@ export default {
       .icon-check_circle
         font-size 24px
         margin-right 4px
+        &.highlight
+          color #00b43c
       &>.text 
         font-size 12px
     .rating_list_wrapper
