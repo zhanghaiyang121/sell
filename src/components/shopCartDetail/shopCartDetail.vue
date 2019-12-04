@@ -5,7 +5,7 @@
                 <div class="shop_cart_detail_content">
                     <header>
                         <span class="title">购物车</span>
-                        <span class="clear">清空</span>
+                        <span class="clear" @click="clearShopCart(shopGoods)">清空</span>
                     </header>
                     <div class="chart_food_list_wrapper">
                         <div class="chart_food_list_content">
@@ -80,6 +80,10 @@ export default {
         },
         decreasefood(food,goodTypeFoods){
             this.$emit("decreasefood",food,goodTypeFoods)
+        },
+        clearShopCart(goods){
+            console.log(goods)
+            this.$emit("clearShopCart",goods)
         }
     },
     mounted(){

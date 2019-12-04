@@ -104,7 +104,7 @@
         </div>
       </transition>
       <div class="shop_cart_wrapper">
-          <shopCart :totalFee="totalFee" :totalNum="totalNum" :shopGoods="shopGoods" @addfood="addfood" @decreasefood="decreasefood"/>
+          <shopCart @clearShopCart="clearShopCart" :totalFee="totalFee" :totalNum="totalNum" :shopGoods="shopGoods" @addfood="addfood" @decreasefood="decreasefood"/>
       </div>
   </div>
 </template>
@@ -259,6 +259,18 @@ export default {
         },
         closeFoodShow(){
             this.showFood=false
+        },
+        clearShopCart(goods){
+            for(let i=0;i<goods.length;i++){
+                if(goods[i].count>0){
+                    goods[i].count=0
+                    for(let j=0;j<goods[i].foods.length;j++){
+                        if(goods[i].foods[j].count>0){
+                            goods[i].foods[j].count=0
+                        }
+                    }
+                }
+            }
         }
         
 

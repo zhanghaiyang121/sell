@@ -20,7 +20,7 @@
             </div>
         </div>
         <div class="shop_cart_detail_wrapper">
-            <shopCartDetail :show="show" @hide="hideCartDetail" :shopGoods="shopGoods" @addfood="addfood" @decreasefood="decreasefood"/>
+            <shopCartDetail :show="show" @hide="hideCartDetail" :shopGoods="shopGoods" @addfood="addfood" @decreasefood="decreasefood" @clearShopCart="clearShopCart"/>
         </div>
     </div>
 </template>
@@ -62,6 +62,9 @@ export default {
         },
         decreasefood(food,goodTypeFoods){
             this.$emit("decreasefood",food,goodTypeFoods)
+        },
+        clearShopCart(goods){
+            this.$emit("clearShopCart",goods)
         }
     }
 }
