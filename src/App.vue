@@ -10,9 +10,9 @@
           <headerDetail @hide="hide" :seller="seller" v-show="show"/>
     </transition>
     <transition name="component-fade" mode="out-in">
-      <!-- <keep-alive> -->
+      <keep-alive>
           <router-view/>
-      <!-- </keep-alive> -->
+      </keep-alive>
     </transition>
   </div>
 </template>
@@ -82,5 +82,13 @@ html, body
     opacity: 0
 .component-fade-enter-active, .component-fade-leave-active {
   transition: all .3s ease;
+}
+.component-fade-enter {
+  opacity: 0
+  transform translate3d(100%,0,0)
+}
+.component-fade-leave-to {
+  opacity: 0
+  transform translate3d(-100%,0,0)
 }
 </style>

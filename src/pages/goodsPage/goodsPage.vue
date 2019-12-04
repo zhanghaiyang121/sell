@@ -20,7 +20,7 @@
                           {{goodsItem.name}}
                       </div>
                       <div class="food_type_list" v-for="(food,itemindex) in goodsItem.foods" :key="itemindex">
-                          <div class="food_item">
+                          <div class="food_item" @click="showFoodDetail(food,goodsItem)">
                               <div class="avatar">
                                   <img :src="food.icon" width="60" height="60" alt="">
                               </div>
@@ -44,6 +44,65 @@
               </div>
           </div>
       </div>
+      <transition name="food-move">
+          <div class="food_detail" v-show="showFood">
+            <div class="food_content">
+                <div class="food_detail_wrapper">
+                    <div>
+                        <div class="avatar">
+                            <i @click="closeFoodShow" class="icon-arrow_lift"></i>
+                            <img :src="currentFood.image" width="100%" alt="">
+                        </div>
+                        <div class="food">
+                            <p class="name">{{currentFood.name}}</p>
+                            <p class="sell_count">
+                                <span class="count">月售{{currentFood.sellCount}}份</span>
+                                <span class="rate">好评率{{currentFood.rating}}%</span>
+                            </p>
+                            <p class="shop_control">
+                                <span class="price">￥{{currentFood.price}}</span>
+                                <span class="add_food_btn right" v-show="!currentFood.count" @click.stop.prevent="addfood(currentFood,currentTypeFoods)">加入购物车</span>
+                                <span class="right" v-show="currentFood.count>0">
+                                    <cartControl :food="currentFood" :goodTypeFoods="currentTypeFoods" @addfood="addfood" @decreasefood="decreasefood"/>
+                                </span>
+                            </p>
+                        </div>
+                        <div class="split"></div>
+                        <div class="food_info_wrapper">
+                            <p class="title">商品信息</p>
+                            <section class="text">{{currentFood.info}}</section>
+                        </div>
+                        <div class="split"></div>
+                        <div class="food_rating_wrapper">
+                            <p class="title">商品评价</p>
+                            <div class="tabs_content">
+                                <div class="all" @click="slectRating('allRatings',1)" :class="{highlight:curretIndex==1}">全部{{allRatings.length}}</div>
+                                <div class="good" @click="slectRating('goodRatings',2)" :class="{highlight:curretIndex==2}">满意{{goodRatings.length}}</div>
+                                <div class="bad" @click="slectRating('badRatings',3)" :class="{highlight:curretIndex==3}">不满意{{badRatings.length}}</div>
+                            </div>
+                            <div class="filter_rating" @click="filterShow=!filterShow">
+                                <i class="icon-check_circle" :class="{highlight:!filterShow}"></i>
+                                <span class="text">只看有内容的评价</span>
+                            </div>
+                            <div class="rating_list_wrapper">
+                                <div class="rating_item" v-for="(item,index) in ratings" :key="index" v-if="filterShow ? true:item.text!=''">
+                                    <div class="avatar">
+                                        <span class="rating_time">{{item.rateTime}}</span>
+                                        <span class="user">{{item.username}}</span>
+                                        <img :src="item.avatar" width="12" height="12" alt="">
+                                    </div>
+                                    <div class="rate_text">
+                                        <span :class="item.rateType==1?'icon-thumb_down':'icon-thumb_up'"></span>
+                                        {{item.text}}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+      </transition>
       <div class="shop_cart_wrapper">
           <shopCart :totalFee="totalFee" :totalNum="totalNum" :shopGoods="shopGoods" @addfood="addfood" @decreasefood="decreasefood"/>
       </div>
@@ -62,7 +121,18 @@ export default {
             menuScroll:{},
             goodsScroll:{},
             heightarr:[],
-            scrollY:0
+            scrollY:0,
+            currentFood:{},
+            currentTypeFoods:{},
+            showFood:false,
+            foodScroll:null,
+            curretIndex:0,
+            goodRatings:[],
+            badRatings:[],
+            allRatings:[],
+            curretIndex:1,
+            filterShow:true,
+            ratings:[]
         }
     },
     components:{
@@ -154,6 +224,43 @@ export default {
                 })
             })
         },
+        showFoodDetail(food,currentTypeFoods){
+            this.showFood=true
+            this.currentFood=food
+            this.currentTypeFoods=currentTypeFoods
+            let goodRating=[]
+            let badRating=[]
+            let allRating=food.ratings
+           
+            for(let i=0;i<allRating.length;i++){
+                if(allRating[i].rateType==0){
+                    goodRating.push(allRating[i])
+                }else{
+                    badRating.push(allRating[i])
+                }
+            }
+            this.goodRatings=goodRating
+            this.badRatings=badRating
+            this.allRatings=allRating
+            this.ratings=allRating
+            this.$nextTick(()=>{
+                if(this.foodScroll){
+                    this.foodScroll.refresh()
+                }else{
+                    this.foodScroll=new BScroll(".food_detail_wrapper",{
+                        click:true
+                    })
+                }
+            })
+        },
+        slectRating(type,index){
+            this.curretIndex=index
+            this.ratings=this[type]
+        },
+        closeFoodShow(){
+            this.showFood=false
+        }
+        
 
     },
     created(){
@@ -305,4 +412,181 @@ export default {
     width 100%
     bottom 0
     left 0
+    z-index 300
+.food_detail
+    height 100vh
+    position absolute
+    top -182px
+    left 0
+    width 100%
+    z-index 200
+    background #fff
+    &.food-move-enter-active,&.food-move-leave-active
+        transition transform 0.4s ease
+    &.food-move-enter,&.food-move-leave-to
+        transform translate3d(100%,0,0)
+    .food_content
+        position absolute
+        top 0
+        bottom 50px
+        width 100%
+        .food_detail_wrapper
+            height 100%
+            .avatar
+                width 100%
+                position relative
+                .icon-arrow_lift
+                    font-size 20px
+                    padding 10px
+                    position absolute
+                    top 0
+                    left 0
+                    color #fff
+            .food
+                padding 18px
+                .name
+                    font-size 14px
+                    font-weight 700
+                    color #333
+                    margin-bottom 8px
+                    line-height 14px
+                .sell_count
+                    .count
+                        margin-right 12px
+                        font-size 10px
+                        color #999
+                    .rate
+                        font-size 10px
+                        color #999
+                .shop_control
+                    display flex
+                    align-items center
+                    .price
+                        margin-right: 8px;
+                        font-size: 14px;
+                        color: #f01414;
+                        line-height 24px
+                        flex 1
+                    .add_food_btn
+                        height 24px
+                        line-height 24px
+                        padding 0 12px
+                        -webkit-box-sizing border-box
+                        box-sizing border-box
+                        border-radius 12px
+                        font-size 10px
+                        color #fff
+                        background #00a0dc
+                        opacity 1
+            .split
+                width: 100%
+                height: 16px
+                border-top: 1px solid rgba(7,17,27,0.1)
+                border-bottom: 1px solid rgba(7,17,27,0.1)
+                background: #f3f5f7
+            .food_info_wrapper
+                padding 18px
+                .title
+                    line-height: 14px;
+                    margin-bottom: 6px;
+                    font-size: 14px;
+                    color: #333;
+                .text
+                    line-height: 24px;
+                    padding: 0 8px;
+                    font-size: 12px;
+                    color: #666;
+            .food_rating_wrapper
+                padding 18px 0
+                .title
+                    padding 0 18px
+                    line-height: 14px;
+                    font-size: 14px;
+                    color: #333;
+                    margin-bottom 18px
+                .tabs_content
+                    margin 0 18px
+                    border-bottom 1px solid rgba(7,17,27,0.1)
+                    padding-bottom 18px
+                    &>div
+                        vertical-align top
+                        display inline-block
+                        margin-right 10px
+                    .all
+                        background rgba(0,160,220,0.2)
+                        font-size 12px
+                        color #666
+                        padding 8px 12px
+                        &.highlight
+                            background #00a0dc
+                            color #fff
+                    .good
+                        background rgba(0,160,220,0.2)
+                        font-size 12px
+                        color #666
+                        padding 8px 12px
+                        &.highlight
+                            background #00a0dc
+                            color #fff
+                    .bad
+                        background #ccc
+                        font-size 12px
+                        color #666
+                        padding 8px 12px
+                        &.highlight
+                            background #666
+                            color #fff
+                .filter_rating
+                    display flex
+                    align-items center
+                    padding 12px 18px
+                    border-bottom 1px solid rgba(7,17,27,0.1);
+                    i 
+                        margin-right: 4px;
+                        font-size: 24px;
+                        color #666
+                        &.highlight
+                            color #00b43c
+                    .text
+                        font-size: 12px;
+                        color #666
+                .rating_list_wrapper
+                    padding 0 18px
+                    .rating_item
+                        padding 18px 0
+                        border-bottom 1px solid rgba(7,17,27,0.1);
+                        &:last-child
+                            border-bottom none
+                        .avatar
+                            display flex
+                            align-items center
+                            margin-bottom 6px
+                            .rating_time
+                                flex 1
+                                line-height: 12px
+                                font-size: 10px
+                                color: #999
+                            .user
+                                line-height: 12px
+                                font-size: 10px
+                                color: #999
+                            img 
+                                border-radius 50%
+                        .rate_text
+                            .icon-thumb_up
+                                font-size 12px
+                                color #00a0dc
+                            .icon-thumb_down
+                                font-size 12px
+                                color #999
+                            line-height: 16px;
+                            font-size: 12px;
+                            color: #333;
+                        
+                    
+
+                    
+
+
+
 </style>

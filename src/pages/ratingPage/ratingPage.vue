@@ -54,7 +54,7 @@
                         {{item.text}}
                     </div>
                     <div class="recommend" v-if="item.recommend.length>0">
-                        <i class="icon-thumb_up"></i>
+                        <i :class="item.rateType==1?'icon-thumb_down':'icon-thumb_up'"></i>
                         <span v-for="(recommenditem,rindex) in item.recommend" :key="rindex">{{recommenditem}}</span>
                     </div>
                 </div>
