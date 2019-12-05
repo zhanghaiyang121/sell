@@ -49,7 +49,7 @@ npm run dev
 
 
 ### 商品首页
-<img src="./static/01.png" width="414" height="736"/>
+<img src="https://github.com/zhanghaiyang121/zhanghaiyang121.github.io/blob/master/assets/img/%E5%86%8D%E8%A7%81%E5%86%8D%E8%A7%81.jpg" width="414" height="736"/>
 
 
 ### 商家公告活动详情
