@@ -1,7 +1,5 @@
 # 前言
 
-[README in English](README-en.md)
-
 这是一个练手的点餐项目，目的是为了熟练vue技术栈，锻炼组件化开发思维。
 
 
