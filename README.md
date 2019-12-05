@@ -52,24 +52,24 @@ npm run dev
 
 ### 商家公告活动详情
 
-<img src="https://github.com/zhanghaiyang121/zhanghaiyang121.github.io/raw/master/assets/img/sell/02.png" width="414" height="736"/>
+<img src="https://github.com/zhanghaiyang121/zhanghaiyang121.github.io/blog/master/assets/img/sell/02.png" width="414" height="736"/>
 
 ### 商品详情页面
 
-<img src="https://github.com/zhanghaiyang121/zhanghaiyang121.github.io/raw/master/assets/img/sell/03.png" width="414" height="736"/>
+<img src="https://github.com/zhanghaiyang121/zhanghaiyang121.github.io/blog/master/assets/img/sell/03.png" width="414" height="736"/>
 
 ### 购物车商品列表
 
-<img src="https://github.com/zhanghaiyang121/zhanghaiyang121.github.io/raw/master/assets/img/sell/04.png" width="414" height="736"/>
+<img src="https://github.com/zhanghaiyang121/zhanghaiyang121.github.io/blog/master/assets/img/sell/04.png" width="414" height="736"/>
 
 
 ### 商家评论页
 
-<img src="https://github.com/zhanghaiyang121/zhanghaiyang121.github.io/raw/master/assets/img/sell/05.png" width="414" height="736"/>
+<img src="https://github.com/zhanghaiyang121/zhanghaiyang121.github.io/blog/master/assets/img/sell/05.png" width="414" height="736"/>
 
 ### 商家详情页
 
-<img src="https://github.com/zhanghaiyang121/zhanghaiyang121.github.io/raw/master/assets/img/sell/06.png" width="414" height="736"/>
+<img src="https://github.com/zhanghaiyang121/zhanghaiyang121.github.io/blog/master/assets/img/sell/06.png" width="414" height="736"/>
 
 
 
