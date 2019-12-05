@@ -12,8 +12,6 @@ vue2  + vue-router + webpack + ES6/7 + axios + stylus + flex + svg + mock
 
 ## 项目运行
 
-#### 注意：由于涉及大量的 ES6/7 等新属性，node 需要 6.0 以上版本
-
 ```
 https://github.com/zhanghaiyang121/sell.git
 
